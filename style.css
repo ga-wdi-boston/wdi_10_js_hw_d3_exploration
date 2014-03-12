@@ -1,0 +1,9 @@
+.stores {
+  border-color: purple;
+  border-width: 5px;
+}
+circle {
+  stroke: purple;
+  stroke-width: 5px;
+  fill: blue;
+}
