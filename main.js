@@ -70,4 +70,5 @@ d3App.draw = function (data) {
       .attr("class", "axis")
       .call(yAxis);
 
+    return true;
 };
