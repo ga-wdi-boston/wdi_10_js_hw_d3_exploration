@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+path {                  /* path is an svg element that is used to create advanced */
+  stroke: #fff;         /* shapes from lines (curves/arcs/etc). The following is a */
+  fill-rule: evenodd;   /* CSS declaration block which will dictate how the 'path' */
+}                       /*  element will look and perform within this code. */
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script> <!-- tells file to use minified d3 js library -->
+<script>
+
+var width = 960,
+    height = 700,
+    radius = Math.min(width, height) / 2;
+
+var x = d3.scale.linear()             // Constructs a new linear scale, using
+    .range([0, 2 * Math.PI]);         // range specified. Is both an object
+                                      // and a function, according to the d3 docs.
+var y = d3.scale.sqrt()               //
+    .range([0, radius]);
+
+var color = d3.scale.category20c();   // Constructs a new ordinal scale ("have a
+                                      // discrete domain, such as a set of names
+                                      // or categories" - d3 docs) with range
+                                      // of twenty categorical colors.
+
+var svg = d3.select("body").append("svg")       // Selects 'body' element,  appends to "svg" element
+    .attr("width", width)                       // Sets width attribute
+    .attr("height", height)                     // Sets height attribute
+  .append("g")                                  // 'g' is a container element used to group
+                                                // objects. any change applied to to 'g' are
+                                                // performed on all child elements.
+    .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 10) + ")");     // See below.
+    // SETS ATTRIBUTES FOR ANIMATION
+
+    // transform: A function - holds list of definitions
+    // that are applied to an element/children. Related
+    // definitions (functions) are predefined in SVG
+    // document type definitions (DTD); when the parser
+    // sees the attribute 'transform', it checks DTD for
+    // a definition.
+
+    // translate: a transform definition that dictates
+    // translation (MOVEMENT). This dictates movement
+    // based on width and height of "body".
+
+
+var partition = d3.layout.partition()   // Sets partition var for use of partition layout.
+    .value(function(d) { return d.size; });   // Sets value of var as size of returned data.
+
+    // MORE INFO ON D3.LAYOUT.PARTITION
+    // Partition layout is "a space-filling variant" of a node-link tree diagram" (from D3 docs).
+    // Instead of visually representing hierarchy of parent-child elements in links, nodes are
+    // represented as solid areas, and relative placement to other nodes is emblematic of
+    // their position.
+    // Size: "encodes a quantitative dimension that would be difficult to show in a node-link
+    // diagram."
+
+var arc = d3.svg.arc()
+    .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x))); })
+    .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx))); })
+    .innerRadius(function(d) { return Math.max(0, y(d.y)); })
+    .outerRadius(function(d) { return Math.max(0, y(d.y + d.dy)); });
+
+d3.json("flare.json", function(error, root) {
+  var path = svg.selectAll("path")
+      .data(partition.nodes(root))
+    .enter().append("path")
+      .attr("d", arc)
+      .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+      .on("click", click);
+
+  function click(d) {
+    path.transition()
+      .duration(750)
+      .attrTween("d", arcTween(d));
+  }
+});
+
+d3.select(self.frameElement).style("height", height + "px");
+
+// Interpolate the scales!
+function arcTween(d) {
+  var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+      yd = d3.interpolate(y.domain(), [d.y, 1]),
+      yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+  return function(d, i) {
+    return i
+        ? function(t) { return arc(d); }
+        : function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); return arc(d); };
+  };
+}
+
+</script>
