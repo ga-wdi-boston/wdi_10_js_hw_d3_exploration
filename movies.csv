@@ -1,5 +1,62 @@
-movie,company,revenue
+movie,company,value
 Avatar,Fox,760
 Titanic,Par,659
 Avengers,BV,623
-Something,BV,500
+The Dark Knight,WB,535
+Star Wars: Episode I,Fox,475
+Star Wars,Fox,461
+The Dark Knight Rises,WB,448
+Shrek 2,DW,441
+E.T.: The Extra-Terrestrial,Uni,435
+Hunger Games: Catching Fire,LGF,424
+Pirates: Dead Man's Chest,BV,423
+The Lion King,BV,423
+Toy Story 3,BV,415
+Iron Man 3,BV,409
+The Hunger Games,LGF,408
+Spider-Man,Sony,403
+Jurassic Park,Uni,402
+Transformers: Revenge of the Fallen,Par,402
+Frozen,BV,394
+Harry Potter 2,WB,381
+Finding Nemo,BV,381
+Star Wars Episode III,Fox,380
+Lord of the Rings III,NL,378
+Spider-Man 2,Sony,374
+The Passion of the Christ,NM,370
+Despicable Me 2,Uni,368
+Transformers: Dark of the Moon,Par,352
+Lord of the Rings II,NL,343
+Spider-Man 3,Sony,337
+Alice in Wonderland,BV,334
+Forrest Gump,Par,330
+Shrek the Third,Par,323
+Transformers,Par,319
+Iron Man,Par,318
+Harry Potter: Sorcerer's Stone,WB,318
+Indiana Jones: Crystal Skull,Par,317
+Lord of the Rings I,NL,316
+Iron Man 2,Par,312
+Star Wars: Episode II,Fox,311
+Return of the Jedi,Fox,309
+Independence Day,Fox,306
+Pirates: Black Pearl,BV,305
+Skyfall,Sony,304
+The Hobbit,WB,302
+Harry Potter: Half-blood Prince,WB,302
+Twilight: Eclipse,Sum,301
+Twilight: New Moon,Sum,297
+Harry Potter: Deathly Hallows,WB,296
+The Sixth Sense,BV,293
+Up,BV,293
+
+
+
+
+
+
+
+
+
+
+
