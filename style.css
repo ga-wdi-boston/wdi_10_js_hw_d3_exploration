@@ -1,0 +1,21 @@
+/*#chart circle {
+  fill: steelblue;
+}
+*/
+h1 {
+  color: tomato;
+  text-align: center;
+}
+
+h3 {
+  color: seagreen;
+  text-align: center;
+}
+
+body {
+  background-color: lemonchiffon;
+}
+
+#chart {
+  background-color: gainsboro;
+}
