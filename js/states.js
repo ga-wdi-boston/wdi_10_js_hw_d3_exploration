@@ -59,8 +59,8 @@ window.onload = function() {
 
     // we created a legend but it is completely empty; set color swatches for
     // each <g> in the legend (recall this is a collection of <g> elements).
-    // I don't really understand the magic with the color there since it is a
-    // function but is not explicitly being called there
+    // I think the magic with color is that it gets automatically passed the
+    // data which at this point is the domain that has the age bracket names
     legend.append("rect")
       .attr("width", 18)
       .attr("height", 18)
