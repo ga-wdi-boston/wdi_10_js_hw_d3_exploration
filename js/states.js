@@ -109,8 +109,8 @@ window.onload = function() {
         // arc is d3.svg.arc() which gets called automatically and passed the
         // data. I tried lots of ways to make "nested" doughnut charts by using
         // a counter or the index of the data to set the inner and outer radii
-        // and this was the only way that worked
-        // without Math.floor(count/7) the radius increments for EACH of the
+        // and this was the only way that worked.
+        // Without Math.floor(count/7) the radius increments for EACH of the
         // elements of each state's data (which is the 7 p)
         .attr("d", function(d) {
           var arc = d3.svg.arc()

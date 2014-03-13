@@ -11,11 +11,10 @@
 <body>
   <div class="container">
     <h1>There's stuff here</h1>
-    <h3>States are alphabetical with AL at the inside, but it's too small to
+    <p>States are alphabetical with AL at the inside, but it's too small to
         append the state names and I couldn't figure out individual click or
-        mouseover handlers to display the statename as the top <svg> (Wyoming)
-        would always receive the click event.
-    </h3>
+        mouseover handlers to display the statename . The outer one would capture the initial mouseover and subsequently moving into inner rings didn't fire additional events (because we're still over the outer one).
+    </p>
   </div>
 </body>
 </html>
