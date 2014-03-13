@@ -1,17 +1,46 @@
 
 window.onload = function() {
-  var data = d3.json("location_of_corner_stores.json", function(error, stores){
-    d3.select("#stores")
-      .selectAll("circle")
-      .data(stores.data)
-      .enter()
-      .append("circle")
-      .attr('cx', function(store, i){return Math.abs(parseFloat(store[13][2]));})
-      .attr('cy', function(store, i ){return parseFloat(store[13][1]);})
-      .attr('r', function(store){return store[8].length;})
-      .attr("transform", function(store, i) { return "translate(" + (store[8].length * (i +1))  + "," +  (Math.floor(Math.random()*20)) +  ")" ; });
+
+  d3.json("location_of_corner_stores.json", function(error, stores){
+    // this var for setting the prev_store - for comparison
+    //var prev_store;
+
+    //getting the data from json
+    var my_stores = d3.select("#stores")
+                    .selectAll("g")
+                    .data(stores.data)
+                    .enter()
+                    // appending the g element to the svg - allowing the circle and the text to be grouped together
+                    .append("g")
+                    .attr("transform", function(store, i){
+                      var translate, deltaX = 0.1, deltaY = 0.1;
+                      //tried to make an offset that related to the ditance between points - but this was still too small
+
+                      // if(prev_store){
+                      //   deltaX = Math.abs(parseFloat(prev_store[13][2]) - parseFloat(store[13][2]));
+                      //   deltaY = Math.abs(parseFloat(prev_store[13][1]) - parseFloat(store[13][1]));
+                      //   console.log(deltaX, " ", deltaY);
+                      // }
+                      translate = "translate(" + ((Math.abs(parseFloat(store[13][2])))*(i + 1))  + "," +  (parseFloat(store[13][1])*(i + 1)) +  ")";
+                      return translate;
+                    })
+                    .attr("class", "node");
+
+        my_stores.append('circle')
+                  // adding a circle that had the radius to be equal to the length of the name
+                 .attr('r', function(store){return store[8].length;})
+                 .attr('id', function(store, i ){return i;});
+
+        my_stores.append('text')
+                // adding a text element to the g element - which is the store name
+                 .text(function(store){return store[8];})
+                 // setting it to the center of the g element
+                 .style("text-anchor", "middle");
   });
-}
+};
+
+
+
 // stores.data[0][8]
 // "Ramirez Grocery"
 // stores.data[0]
