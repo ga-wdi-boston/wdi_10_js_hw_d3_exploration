@@ -5,73 +5,82 @@
 body {
   font: 10px sans-serif;
 }
+/* specifies the font size and type of the body of the chart */
 
 .axis path,
 .axis line {
   fill: none;
   stroke: #000;
-  shape-rendering: crispEdges;
+  shape-rendering: crispEdges; /* crispEdges means that the browser should emphasize the contrast between clean edges of artwork over rendering speed and geometric precision*/
 }
-
-.bar {
-  fill: steelblue;
-}
-
-.x.axis path {
-  display: none;
-}
+/* properties of the actual line of the axes */
 
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
+//This is setting the margins of the chart and padding the chart with those margins
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
+//Constructs a new ordinal scale with an empty domain and an empty range. The ordinal scale is invalid (always returning undefined) until an output range is specified. Range bounds specify how far the grouped bars should be from each other
 var x0 = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
 
+//This scale is for the actual bars whereas var x0 is to make the actual axis for the ticks.
 var x1 = d3.scale.ordinal();
 
+//Linear scales map a continuous input domain to a continuous output range
 var y = d3.scale.linear()
     .range([height, 0]);
 
+//Setting the range of colors for the x axis
 var color = d3.scale.ordinal()
     .range(["#ffd700", "#c0c0c0", "#cd7f32", "#216200"]);
 
+//How to orient the svg x axis
 var xAxis = d3.svg.axis()
     .scale(x0)
     .orient("bottom");
 
+//How to orient the svg y axis, also specifies how format the ticks.
 var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left")
-    .tickFormat(d3.format(".2s"));
+    .tickFormat(d3.format("2s"));
 
+//Actually adds the graph body as an svg rectangle
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+//specifies to use the csv file and sets up the var of each countries medals
 d3.csv("medals.csv", function(error, medals) {
   var countryMedals = d3.keys(medals[0]).filter(function(key) { return key !== "Country"; });
 
+//For each country map the values of number of medals into an array.
   medals.forEach(function(d) {
     d.country = countryMedals.map(function(name) { return {name: name, value: +d[name]}; });
   });
 
+//x0 will get the value of the countries names
   x0.domain(medals.map(function(d) { return d.Country; }));
+  //x1 calculates the actual bars to the x-axis for each country as specified in x0.
   x1.domain(countryMedals).rangeRoundBands([0, x0.rangeBand()]);
+  //maps the y value of the number of medals, based on the values of the country's name and the type of medal
   y.domain([0, d3.max(medals, function(d) { return d3.max(d.country, function(d) { return d.value; }); })]);
 
+//appends the x-axis to the chart and specifies it's height on the chart
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
+//appends the y-axis to the chart and orients it upright (otherwise the bars would point down) and labels it
   svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
@@ -82,12 +91,14 @@ d3.csv("medals.csv", function(error, medals) {
       .style("text-anchor", "end")
       .text("Medals");
 
+//appends each country to the x0 axis
   var country = svg.selectAll(".country")
       .data(medals)
     .enter().append("g")
       .attr("class", "g")
       .attr("transform", function(d) { return "translate(" + x0(d.Country) + ",0)"; });
 
+//appends each countries number of medals of each type as a rectangle to x1 axis and fills each bar with appropriate color
   country.selectAll("rect")
       .data(function(d) { return d.country; })
     .enter().append("rect")
@@ -97,18 +108,20 @@ d3.csv("medals.csv", function(error, medals) {
       .attr("height", function(d) { return height - y(d.value); })
       .style("fill", function(d) { return color(d.name); });
 
+//Creates the legend for the different bars
   var legend = svg.selectAll(".legend")
       .data(countryMedals.slice().reverse())
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+//Creates and appends the legend to a rectangle
   legend.append("rect")
       .attr("x", width - 18)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color);
-
+//Appends the text to the legend.
   legend.append("text")
       .attr("x", width - 24)
       .attr("y", 9)
