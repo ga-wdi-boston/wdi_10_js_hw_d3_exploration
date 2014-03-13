@@ -5,7 +5,7 @@ window.onload = function() {
       .data(stores.data)
       .enter()
       .append("circle")
-      .attr('cx', function(store){return Math.abs(parseFloat(store[13][2]));})
+      .attr('cx', function(store, i){return Math.abs(parseFloat(store[13][2]) + i);})
       .attr('cy', function(store){return parseFloat(store[13][1]);})
       .attr('r', function(store){return store[8].length;});
   });
