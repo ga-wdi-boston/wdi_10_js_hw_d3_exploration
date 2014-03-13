@@ -3,7 +3,7 @@ window.onload = function() {
 
   d3.json("location_of_corner_stores.json", function(error, stores){
     // this var for setting the prev_store - for comparison
-    //var prev_store;
+    var prev_store;
 
     //getting the data from json
     var my_stores = d3.select("#stores")
@@ -14,15 +14,17 @@ window.onload = function() {
                     .append("g")
                     .attr("transform", function(store, i){
                       var translate, deltaX = 0.1, deltaY = 0.1;
-                      //tried to make an offset that related to the ditance between points - but this was still too small
-
-                      // if(prev_store){
-                      //   deltaX = Math.abs(parseFloat(prev_store[13][2]) - parseFloat(store[13][2]));
-                      //   deltaY = Math.abs(parseFloat(prev_store[13][1]) - parseFloat(store[13][1]));
-                      //   console.log(deltaX, " ", deltaY);
-                      // }
-                      translate = "translate(" + ((Math.abs(parseFloat(store[13][2])))*(i + 1))  + "," +  (parseFloat(store[13][1])*(i + 1)) +  ")";
+                      //tried to make an offset that related to the ditance between points each store compared to the previous store
+                      if(prev_store){
+                        deltaX = Math.abs(parseFloat(prev_store[13][2]) - parseFloat(store[13][2]));
+                        deltaY = Math.abs(parseFloat(prev_store[13][1]) - parseFloat(store[13][1]));
+                        console.log(deltaX, " ", deltaY);
+                      }
+                      // now translating the g element to allow for the deltaX to be visable plus an off set of 100
+                      translate = "translate(" + ((deltaX * 100000) + 100 )  + "," +  ((deltaY * 100000) + 100) +  ")";
+                      prev_store = store;
                       return translate;
+                      console.log( deltaX, deltaY);
                     })
                     .attr("class", "node");
 
