@@ -1,0 +1,16 @@
+{
+ "name": "movies",
+ "children": [
+  {
+   "name": "Avatar",
+   "company": "Paramount",
+   "revenue": 760
+  }
+  {
+   "name": "Titanic",
+   "company": "Fox",
+   "revenue": 740
+  }
+ ]
+}
+
