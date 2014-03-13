@@ -1,3 +1,4 @@
+
 window.onload = function() {
   var data = d3.json("location_of_corner_stores.json", function(error, stores){
     d3.select("#stores")
@@ -5,12 +6,12 @@ window.onload = function() {
       .data(stores.data)
       .enter()
       .append("circle")
-      .attr('cx', function(store, i){return Math.abs(parseFloat(store[13][2]) + i);})
-      .attr('cy', function(store){return parseFloat(store[13][1]);})
-      .attr('r', function(store){return store[8].length;});
+      .attr('cx', function(store, i){return Math.abs(parseFloat(store[13][2]));})
+      .attr('cy', function(store, i ){return parseFloat(store[13][1]);})
+      .attr('r', function(store){return store[8].length;})
+      .attr("transform", function(store, i) { return "translate(" + (store[8].length * (i +1))  + "," +  (Math.floor(Math.random()*20)) +  ")" ; });
   });
 }
-
 // stores.data[0][8]
 // "Ramirez Grocery"
 // stores.data[0]

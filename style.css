@@ -6,4 +6,8 @@ circle {
   stroke: purple;
   stroke-width: 2px;
   fill: blue;
+  padding-top: 100px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 100px;
 }
