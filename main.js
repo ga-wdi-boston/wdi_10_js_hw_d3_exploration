@@ -41,6 +41,7 @@ window.onload = function(){
 	    // with class arc
 	    .enter().append("g")
 	      .attr("class", "arc");
+	      debugger
 
 	  // Append a path element to each g element
 	  // Set fill color to hex value of same index in color array above
