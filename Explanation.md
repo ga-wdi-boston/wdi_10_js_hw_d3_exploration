@@ -1,3 +1,5 @@
+# D3 "Exploration"
+
 I took one of the basic examples (multiple doughnut graphs) and made them
 nested. This was unexpectedly a lot of work. The major problem I ran into
 is that the way a pie chart is rendered is that all the data values for
@@ -9,7 +11,24 @@ d3.svg.arc() in order to draw the pie chart.
 
 This works fine for individual charts, but when I tried to dynamically
 set the .innerRadius() and .outerRadius() properties of d3.svg.arc() as
-I was calling it to set the "d" attribute of my paths the value of the
+I was calling it:
+
+    svg.selectAll(".arc")
+        .data(function(d) { return pie(d.ages)}; )
+      .enter().append("path")
+        .attr("class", "arc")
+        .attr("d", function(d, i) {
+          // problem here is i is the index within d.ages above
+          // and it updates for EACH arc
+          // if you try setting the data to just d and then returning
+          // arc(pie(d.ages)) below it throws an error I don't quite
+          // understand
+          var arc = d3.svg.arc().innerRadius(i*10 + 10)
+                    .outerRadius(i*10 + 10);
+          return arc(d);
+        });
+
+to set the "d" attribute of my paths the value of the
 radii would actually be updated for EACH path within the chart, meaning
 if my radii increased by 10 each time a given chart would have staggered
 arcs, rather than just being a dougnut with a consistent inner/outer
@@ -22,7 +41,9 @@ and then using Math.floor(count/7) so that the radii on d3.svg.arc()
 effectively only incremented every 7 data points. Since each state has 7
 data points for the 7 age brackets, this means a given states arcs all
 have the same inner/outer radii (making a doughnut graph), and then the
-next state has its inner/outer radii incremented.
+next state has its inner/outer radii incremented. Right now this is hard-
+coded but you could just use `Math.floor(count/d.length)` to adapt to
+different numbers of age ranges.
 
 One problem with this is that there's really no room for the state
 labels. I tried to get around this by assigning a mouseover handler to
