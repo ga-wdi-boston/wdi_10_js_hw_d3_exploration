@@ -1,0 +1,9 @@
+body {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .55;
+  stroke: #000;
+  stroke-width: .10px;
+}
