@@ -1,5 +1,7 @@
 # D3 Graph - Plotting Obesity Rates against Number of McDonalds per Capita, by State
 
+There didn't end up being much of a correlation, but in any case...
+
 General flow:
 
 1. Define variables that will capture the x and y values for each data element (i.e., state)
