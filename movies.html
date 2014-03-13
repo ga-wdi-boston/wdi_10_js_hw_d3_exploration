@@ -8,56 +8,65 @@ text {
 
 </style>
 <body>
+  <h1>Top 50 Highest Grossing Movies of all time, by Studio</h1>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
+// sets the diameter, to be used as the size of the SVG element
 var diameter = 960,
-    format = d3.format(",d"),
+    // Constructs a new ordinal scale with a range of twenty categorical colors
     color = d3.scale.category20c();
 
+// Creates a new pack layout with the default settings
 var bubble = d3.layout.pack()
+    // no sorting
     .sort(null)
+    //sets the available layout size to the specified two-element array of numbers representing x and y
     .size([diameter, diameter])
+    // sets the approximate padding between adjacent circles, in pixels
     .padding(1.5);
 
+// Creates an svg variable, which will be used later to add svg element to DOM
 var svg = d3.select("body").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
     .attr("class", "bubble");
 
+// Gets the information from 'movies.csv'
 d3.csv("movies.csv", function(error, root) {
   var node = svg.selectAll(".node")
+      // Runs the pack layout, returning the array of nodes associated with the specified root node
+      //bubble assumes each input data is an object with a children array
+      // This function also sets the x, y, and r values (very impt.)
       .data(bubble.nodes({children: root})
       .filter(function(d) { return !d.children; }))
+    // For each element in root, we're appending a g element with class node
     .enter().append("g")
       .attr("class", "node")
+      // Positions each element based on x and y values
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
+  // Appends a title node to each g class
   node.append("title")
-      .text(function(d) {return d.className + ": " + format(d.value); });
+      .text(function(d) { return d.movie + ": " + d.value; });
 
+  // creates the circle and appends it to each g element!!
   node.append("circle")
+      // radius is assigned according to r value of each data element
       .attr("r", function(d) { return d.r; })
+      // Assigns the fill color for each circle.
+      // The color function will return colors based on d3.scale.category20c();
       .style("fill", function(d) { return color(d.company); });
 
+  // creates the text that goes inside of each g element
   node.append("text")
       .attr("dy", ".3em")
       .style("text-anchor", "middle")
-      .text(function(d) { debugger; return d.movie; });
+      // sets the value of the text element
+      .text(function(d) { return d.movie; });
 });
 
-// Returns a flattened hierarchy containing all leaf nodes under the root.
-// function classes(root) {
-//   var classes = [];
 
-//   function makeArray(node) {
-//     node.forEach(function(child) {classes.push({movie: child.movie, company: child.company, value: child.value})})
-//   }
-
-//   makeArray(root);
-//   return {children: classes};
-// }
-
-d3.select(self.frameElement).style("height", diameter + "px");
+//d3.select(self.frameElement).style("height", diameter + "px");
 
 </script>
