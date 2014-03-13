@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+
+<style>
+body {
+  font: 11px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: #000;
+}
+
+.tooltip {
+  position: absolute;
+  width: 200px;
+  height: 28px;
+  pointer-events: none;
+}
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// Set up x values
+var xValue = function(d) { return d.obesity;}, // x value is determined by obesity value for a given state
+    xScale = d3.scale.linear().range([0, width]), // scale the graph
+    xMap = function(d) { return xScale(xValue(d));},
+    xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+
+// Set up the y values
+var yValue = function(d) { return d.mcDonaldsPerCapitaScaled;}, // y value is determined by # of mcdonalds for a given state
+    yScale = d3.scale.linear().range([height, 0]), // scale the graph
+    yMap = function(d) { return yScale(yValue(d));},
+    yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+// setup fill color
+var cValue = function(d) { return d.State;},
+    color = d3.scale.category10();
+
+// Add an svg element to the body of the webpage
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// Add the tooltip area to the page
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0); //Set opacity to zero initially so that tooltips don't appear yet
+
+// Load the data from the csv file
+d3.csv("data.csv", function(error, data) {
+
+  // Change strings (from CSV) into number format
+  data.forEach(function(d) {
+    d.obesity = +d.obesity;
+    d.mcDonaldsPerCapitaScaled = +d.mcDonaldsPerCapitaScaled;
+  });
+
+  // Prevent dots from overlapping
+  xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
+  yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+
+  // Set up the x-axis
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis) //Calling xAxis function above
+    .append("text")// Append axis label
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", -6)
+      .style("text-anchor", "end") // Position label at the end of the axis
+      .text("Obesity (% of population)"); // Label axis
+
+  // Set up the y-axis
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis) //Calling yAxis function above
+    .append("text")// Append axis label
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end") // Position label at the end of the axis
+      .text("McDonalds per Capita"); // Label axis
+
+  // Draw dots to represent each state on the chart
+  svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle") // Append a circle element for each state in the data set
+      .attr("class", "dot")
+      .attr("r", 3.5) // Set the radius of the circles
+      .attr("cx", xMap) // Set the x axis positioning of the circle based on obesity value
+      .attr("cy", yMap) // Set the y axis positioning of the circle based on # of mcdonalds
+      .style("fill", function(d) { return color(cValue(d));})
+      .on("mouseover", function(d) { // Set event listener to trigger tool tip when dot is moused over
+          tooltip.transition() // Set tooltip to fade in slowly when dot is moused over
+               .duration(200)
+               .style("opacity", .9);
+          tooltip.html(d.State) // Set tooltip to show state when dot is hovered over
+               .style("left", (d3.event.pageX + 5) + "px") // Set positioning of tooltip
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition() // Set tooltip to fade out slowly when mouse is moved away
+               .duration(500)
+               .style("opacity", 0);
+      });
+});
+
+</script>
+</body>
+</html>
