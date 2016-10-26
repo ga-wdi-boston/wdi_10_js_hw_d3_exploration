@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 960px;
+  height: 500px;
+  position: relative;
+}
+
+path.slice{
+  stroke-width:2px;
+}
+
+polyline{
+  opacity: .3;
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+</style>
+<body>
+<button class="randomize">randomize</button>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+// this is to append svg to DOM and add g tag to this svg, this g tag is for translate position
+var svg = d3.select("body")
+  .append("svg")
+  .append("g")
+// add three g tag to the higher g tag
+svg.append("g")
+  .attr("class", "slices");
+svg.append("g")
+  .attr("class", "labels");
+svg.append("g")
+  .attr("class", "lines");
+// initialize the svg size and radius size
+var width = 960,
+    height = 450,
+  radius = Math.min(width, height) / 2;
+
+// pie method will take an array of integer and return angle based on these integers.
+var pie = d3.layout.pie()
+  .sort(null)
+  .value(function(d) {
+    return d.value;
+  });
+// arc method will build two circles for each slice class, it's the basic structure
+var arc = d3.svg.arc()
+  .outerRadius(radius * 0.8)
+  .innerRadius(radius * 0.4);
+// outerArc will build the hide circle for limiting the text
+var outerArc = d3.svg.arc()
+  .innerRadius(radius * 0.9)
+  .outerRadius(radius * 0.9);
+
+// transform the position of g tag
+svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+// return the label of tag
+var key = function(d){ return d.data.label; };
+// this function will give random array for the age array
+function shuffle(o){
+    for(var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+};
+
+d3.csv("data.csv", function(error, data){
+  data.forEach(function(d) {
+    d.population = +d.population;
+  });
+  var dataFrom = {};
+  data.forEach(function(d) {
+    dataFrom[d.age] = d.population
+  });
+  var color = d3.scale.ordinal()
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+  function randomData (){
+    //color.domain() function will return the data value of each tags
+    var labels = dataFrom;
+    // return an array of object where each object key is label name and value is random number
+    var keyArray = Object.keys(labels);
+    keyArray = shuffle(keyArray);
+    return keyArray.map(function(value, index) {
+      return { label: value, value: labels[value] }
+    });
+    // return labels.map(function(label, value){
+    //   return { label: label, value: value }
+    // });
+  }
+  // call change(data) method for initialize
+    change(randomData());
+
+  // listen to the button of randomize when it clicked, call function to change location
+  d3.select(".randomize")
+    .on("click", function(){
+      change(randomData());
+      i = -1;
+    });
+
+  // this is the change method
+  function change(data) {
+
+    /* ------- PIE SLICES -------*/
+    // select all of the path tags inside slices class, pass angle and label name to that and form slice value.
+    var slice = svg.select(".slices").selectAll("path.slice")
+      .data(pie(data), key);
+    // insert each of the data in slice to DOM this will only gives style and class attribute to each of the slice
+    slice.enter()
+      .insert("path")
+      .style("fill", function(d) { return color(d.data.label); })
+      .attr("class", "slice");
+
+    slice
+      .transition().duration(1000)
+      // give the d attribute an arc value with contains angle of this data
+      .attrTween("d", function(d) {
+        //this refers to the current tag, and this._current refers to data associate with this data, use || for the first time initialize
+        this._current = this._current || d;
+        //this line is to interpolate the current with the newest data
+        var interpolate = d3.interpolate(this._current, d);
+        // assign the newest data(data from random method) to current
+        this._current = interpolate(0);
+        return function(t) {
+          return arc(interpolate(t));
+        };
+      })
+
+    slice.exit()
+      .remove();
+
+    /* ------- TEXT LABELS -------*/
+    // same as slice, first slect text element and assign data and tag name
+    var text = svg.select(".labels").selectAll("text")
+      .data(pie(data), key);
+    // add one attribute 'dy' to each text element, and also and the text to show on page
+    text.enter()
+      .append("text")
+      .attr("dy", ".35em")
+      .text(function(d) {
+        return d.data.label;
+      });
+    // for each position of the arc, find the midAngle
+    function midAngle(d){
+      return d.startAngle + (d.endAngle - d.startAngle)/2;
+    }
+
+    text.transition().duration(1000)
+      .attrTween("transform", function(d) {
+        // this refers to the current tag, and this._current refers to data associate with this data, use || for the first time initialize
+        this._current = this._current || d;
+        // this line is to interpolate the current with the newest data
+        var interpolate = d3.interpolate(this._current, d);
+        // assign the newest data(data from random method) to current
+        this._current = interpolate(0);
+        return function(t) {
+          // find the current data by interpolate a random number
+          var d2 = interpolate(t);
+          // find the location that should goes, the centroid method will return the centroid of two angle value
+          var pos = outerArc.centroid(d2);
+          // if the angle greater than PI, than assign it to a nagitive value
+          pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+          // assigin this translate to the child
+          return "translate("+ pos +")";
+        };
+      })
+      .styleTween("text-anchor", function(d){
+        // this will assigin style of text-anchor, which is the position of text.
+        this._current = this._current || d;
+        var interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return function(t) {
+          var d2 = interpolate(t);
+          //The rendered characters are aligned such that the end of the text string is at the initial current text position.The rendered characters are aligned such that the start of the text string is at the initial current text position. 
+          return midAngle(d2) < Math.PI ? "start":"end";
+        };
+      });
+
+    text.exit()
+      .remove();
+
+    /* ------- SLICE TO TEXT POLYLINES -------*/
+    // this basicly same as previous two
+    var polyline = svg.select(".lines").selectAll("polyline")
+      .data(pie(data), key);
+    // enter and binding data
+    polyline.enter()
+      .append("polyline");
+    // assign points attribute to the polyline
+    polyline.transition().duration(1000)
+      .attrTween("points", function(d){
+        this._current = this._current || d;
+        var interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return function(t) {
+          var d2 = interpolate(t);
+          // position is limited by outerArc
+          var pos = outerArc.centroid(d2);
+          // give lefthand side polylines and righthand side polylines
+          pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+          return [arc.centroid(d2), outerArc.centroid(d2), pos];
+        };
+      });
+
+    polyline.exit()
+      .remove();
+  };
+})
+
+</script>
+</body>
